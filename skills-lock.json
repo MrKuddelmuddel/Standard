@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "skills": {
+    "access": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "external_plugins/discord/skills/access/SKILL.md",
+      "computedHash": "658df698a3f86733c01cbc007f7bb6cff907656765a58ab0f6f884ca8bdf3bf7"
+    },
+    "agent-development": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/plugin-dev/skills/agent-development/SKILL.md",
+      "computedHash": "d1b651e2d9c1ebefeecbd88be824013cd9693a4f1268404b571d18f396bc18b5"
+    },
+    "build-mcp-app": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/mcp-server-dev/skills/build-mcp-app/SKILL.md",
+      "computedHash": "b6c70a7b3d3c685e813706d94a0383cd0d2eff4d7a9eb963efd22445a8d946c6"
+    },
+    "build-mcp-server": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/mcp-server-dev/skills/build-mcp-server/SKILL.md",
+      "computedHash": "b98ddf5944e3a1e2bdaad3d6fc3d2afbe29941595817721971cf41d6da81c81e"
+    },
+    "build-mcpb": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/mcp-server-dev/skills/build-mcpb/SKILL.md",
+      "computedHash": "97eaeeffb27721ffe5fc4ada6e3c15cffbf4121616603cd1b5f3f5da41102a7b"
+    },
+    "cardputer-buddy": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/cwc-makers/skills/cardputer-buddy/SKILL.md",
+      "computedHash": "769de30bec3e3f88898d070b96e1eeb77bc5df8816994b399de317e68abec49e"
+    },
+    "claude-automation-recommender": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/claude-code-setup/skills/claude-automation-recommender/SKILL.md",
+      "computedHash": "d8d53f9b67da49216256ed79ed38057ef1ee760bd499cf413107ae7504aedafd"
+    },
+    "claude-md-improver": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/claude-md-management/skills/claude-md-improver/SKILL.md",
+      "computedHash": "d6707ed0467d9664d0f9d2c44724c8fb1814475ec6d3c62a5d54bbbe807e0775"
+    },
+    "claude-security": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/claude-security/skills/claude-security/SKILL.md",
+      "computedHash": "5e4b6f34f21865d3f6e957ea43b26bcbba28f1f3c05a271641139204e6757926"
+    },
+    "command-development": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/plugin-dev/skills/command-development/SKILL.md",
+      "computedHash": "45f934e3be4f2c3f202a296e268dd61b7265894e2df54e9f00c418b9671848c8"
+    },
+    "configure": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "external_plugins/discord/skills/configure/SKILL.md",
+      "computedHash": "57c433ed8ec92db936af0b43bde7f98b49b040518893dfe88ffe28771a884f69"
+    },
+    "frontend-design": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/frontend-design/skills/frontend-design/SKILL.md",
+      "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
+    },
+    "hook-development": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/plugin-dev/skills/hook-development/SKILL.md",
+      "computedHash": "7bda9057df5162ac7a141dab5d5b4876c2fa37516eb757f3efc6f7dcebe73aa2"
+    },
+    "m5-onboard": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/cwc-makers/skills/m5-onboard/SKILL.md",
+      "computedHash": "213795eb11869200c6fdd74c1376adedaf1034200efe0f208d19f20cfda7f9ce"
+    },
+    "math-olympiad": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/math-olympiad/skills/math-olympiad/SKILL.md",
+      "computedHash": "5c1683e1b33dfe1d493cf5c68aa8dd8e2a8b3bb9e2681bfa94c11d1f84966d25"
+    },
+    "mcp-integration": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/plugin-dev/skills/mcp-integration/SKILL.md",
+      "computedHash": "984b4bb3ef0fb6fac0fec9dcc4e42df794660f87631c2c3ab29f5e24b3123b89"
+    },
+    "playground": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/playground/skills/playground/SKILL.md",
+      "computedHash": "a499ef286b1bcda80afe4de53b2d0a5a84c317c11cfdafc2af6e53985c77940d"
+    },
+    "plugin-settings": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/plugin-dev/skills/plugin-settings/SKILL.md",
+      "computedHash": "39f295af247420627c1fd06d7dd9659c461b87f0bb0b5ed718fc4f23c3a25af2"
+    },
+    "plugin-structure": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/plugin-dev/skills/plugin-structure/SKILL.md",
+      "computedHash": "1fd8152a20ae6b51e75064619cdf87db5d487c8514506774c66d2708001148a9"
+    },
+    "project-artifact": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/project-artifact/skills/project-artifact/SKILL.md",
+      "computedHash": "9ffb2ef8b62fb52122c847cb8bc8dc9b6f60fc13e6422d7479477ad6c31e9ef2"
+    },
+    "receipts": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/receipts/skills/receipts/SKILL.md",
+      "computedHash": "faaec2dd25f7a303567d4d0ede604d3dc0d790f671260b16ca3099932b2654dd"
+    },
+    "session-report": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/session-report/skills/session-report/SKILL.md",
+      "computedHash": "603c0c8109069472a7cddba7c9956141c4345d27dd8f29736009bab9d1361c3d"
+    },
+    "siege": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/math-proof/skills/siege/SKILL.md",
+      "computedHash": "ed88b043a92a876bebcd6c455dc28935fe72d2f5900f606401c2d9b9b96a0ee7"
+    },
+    "skill-creator": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/skill-creator/skills/skill-creator/SKILL.md",
+      "computedHash": "b122f4d1e91aa1d83027e050b5b37c3156203ee85458d7b1360bc48167c9e02a"
+    },
+    "skill-development": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/plugin-dev/skills/skill-development/SKILL.md",
+      "computedHash": "5f30c8717078c18ae0be71dcd3309a27730432e38b9d958b22ebb6ea33e5941a"
+    },
+    "solo": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/math-proof/skills/solo/SKILL.md",
+      "computedHash": "921249c534bd4c19b7c78b5a6f76cdb3a32c59a22145a3676a913dd7395e1df4"
+    },
+    "writing-hookify-rules": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "skillPath": "plugins/hookify/skills/writing-rules/SKILL.md",
+      "computedHash": "f9705872d7d4b8bd1a6e941f818cdd547a87bac334ee066ad46ec7fa14e3c73b"
+    }
+  }
+}
