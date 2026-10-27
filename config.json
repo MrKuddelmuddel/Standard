@@ -1,0 +1,20 @@
+{
+  "symbol": "BTC/USDT",
+  "timeframe_minutes": 60,
+  "start_capital": 10000,
+  "fee_rate": 0.001,
+  "slippage_rate": 0.0005,
+  "risk_per_trade": 0.01,
+  "max_daily_loss": 0.03,
+  "min_rr": 1.5,
+  "max_cost_ratio": 0.25,
+  "max_position_pct": 0.5,
+  "max_bars_in_trade": 48,
+  "cooldown_bars": 3,
+  "oos_fraction": 0.3,
+  "warmup_bars": 250,
+  "min_trades_for_choice": 20,
+  "bootstrap_runs": 2000,
+  "random_baseline_runs": 200,
+  "strategies": ["breakout", "pullback"]
+}

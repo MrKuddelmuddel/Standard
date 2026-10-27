@@ -1,0 +1,4 @@
+numpy>=1.26
+pandas>=2.1
+# nur für fetch_data.py (echte Kurse holen):
+ccxt>=4.0
