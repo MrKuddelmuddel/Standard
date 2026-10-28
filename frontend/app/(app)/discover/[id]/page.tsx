@@ -112,7 +112,7 @@ function DiscoveryDetail() {
             <>
               <Select
                 aria-label="Filter by status"
-                className="h-7 w-36 text-xs"
+                className="h-7 w-44 text-xs"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 options={[
@@ -147,13 +147,13 @@ function DiscoveryDetail() {
           ) : cands.data.items.length === 0 ? (
             <p className="p-4 text-[13px] text-fg-muted">No candidates match.</p>
           ) : (
-            <Table head={["Candidate", "Status", "Score", "Val. return", "Val. max DD", "Val. trades", "Val. PF", "Val. ×2 costs", "Test return", "Test trades", ""]}>
+            <Table head={["Candidate", "Status", "Train return", "Train trades", "Score", "Val. return", "Val. max DD", "Val. trades", "Val. PF", "Val. ×2 costs", "Test return", "Test trades", ""]}>
               {cands.data.items.map((c) => (
                 <CandidateRow key={c.id} c={c} open={open === c.id} onToggle={() => setOpen(open === c.id ? null : c.id)} onSave={() => void save(c)} saving={saving === c.id} />
               ))}
             </Table>
           )}
-          <p className="border-t border-line px-4 py-2 text-xs text-fg-faint">Score uses validation metrics only. Test results are shown for candidates that passed validation and were never used for ranking.</p>
+          <p className="border-t border-line px-4 py-2 text-xs text-fg-faint">Candidates are first filtered on the train segment (trades, expectancy, drawdown); only survivors are measured on validation. Score uses validation metrics only. Test results are shown for candidates that passed validation and were never used for ranking.</p>
         </Panel>
       )}
       <p className="mt-3 text-xs text-fg-faint">Created {dt(d.created_at)} · data fingerprint {d.data_fingerprint?.slice(0, 12) ?? "n/a"}</p>
@@ -172,6 +172,7 @@ function CandidateRow({ c, open, onToggle, onSave, saving }: { c: Candidate; ope
           <button type="button" onClick={onToggle} aria-expanded={open} className="text-left font-medium text-fg hover:text-accent">
             {c.name}
           </button>
+          {c.rejection_reason && <div className="mt-0.5 text-xs text-fg-faint">{humanReason(c.rejection_reason)}</div>}
           {c.flags.length > 0 && (
             <div className="mt-0.5 flex flex-wrap gap-1">
               {c.flags.map((f) => (
@@ -184,6 +185,12 @@ function CandidateRow({ c, open, onToggle, onSave, saving }: { c: Candidate; ope
         </td>
         <td>
           <StatusBadge status={c.status} />
+        </td>
+        <td>
+          <MetricCell k="net_return" m={c.metrics.train} />
+        </td>
+        <td>
+          <MetricCell k="trade_count" m={c.metrics.train} />
         </td>
         <td className="num">{c.score !== null ? num(c.score, 3) : "n/a"}</td>
         <td>
@@ -207,7 +214,7 @@ function CandidateRow({ c, open, onToggle, onSave, saving }: { c: Candidate; ope
           {c.strategy_version_id ? (
             <Badge tone="positive">saved</Badge>
           ) : (
-            <Button size="sm" onClick={onSave} loading={saving}>
+            <Button size="sm" className="whitespace-nowrap" onClick={onSave} loading={saving}>
               Save as strategy
             </Button>
           )}
@@ -215,7 +222,7 @@ function CandidateRow({ c, open, onToggle, onSave, saving }: { c: Candidate; ope
       </tr>
       {open && (
         <tr>
-          <td colSpan={11} className="bg-panel-2">
+          <td colSpan={13} className="bg-panel-2">
             <div className="grid gap-3 py-1 text-xs md:grid-cols-2">
               <div className="space-y-1">
                 <div>
@@ -226,7 +233,7 @@ function CandidateRow({ c, open, onToggle, onSave, saving }: { c: Candidate; ope
                   <span className="text-fg-faint">Exit: </span>
                   <code>{def.exit[side] ? describeCondition(def.exit[side], def.indicators) : "stop / target only"}</code>
                 </div>
-                {c.rejection_reason && <div className="text-negative">Rejected: {c.rejection_reason}</div>}
+                {c.rejection_reason && <div className="text-negative">Rejected: {humanReason(c.rejection_reason)}</div>}
               </div>
               <Table head={["Segment", "Return", "Max DD", "Trades", "Win rate", "PF"]}>
                 {(["train", "validation", "test"] as const).map((k) => (
@@ -254,4 +261,11 @@ function CandidateRow({ c, open, onToggle, onSave, saving }: { c: Candidate; ope
       )}
     </>
   );
+}
+
+function humanReason(r: string): string {
+  if (r === "non_positive_expectancy_in_train") return "Rejected in train: average trade lost money.";
+  if (r.startsWith("too_few_trades")) return `Rejected in train: ${r.replace("too_few_trades: ", "too few trades (").replace(" in train", ")")}.`;
+  if (r.startsWith("not_in_shortlist")) return "Passed train filters but not in the shortlist (ranked by train expectancy in R).";
+  return r.replaceAll("_", " ");
 }

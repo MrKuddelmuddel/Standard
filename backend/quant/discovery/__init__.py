@@ -98,6 +98,8 @@ def generate_candidates(cfg: SearchConfig) -> list[tuple[str, dict]]:
     for tpl in cfg.templates:
         if tpl == "ema_cross":
             for f, s, st, tp in itertools.product(p.ema_fast, p.ema_slow, p.stop_atr, p.take_profit_r):
+                if f >= s:
+                    continue  # the fast average must be shorter than the slow one
                 ops = ("crosses_above", "crosses_below") if up else ("crosses_below", "crosses_above")
                 out.append(
                     (

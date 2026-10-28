@@ -1,0 +1,80 @@
+# Local full stack: PostgreSQL, API, background worker and web UI.
+#   cp .env.example .env    # adjust values, never commit .env
+#   docker compose up --build
+# Open http://localhost:3000. The API is only reachable through the web proxy unless you publish port 8000.
+name: nexus-quant
+
+x-backend-env: &backend-env
+  NEXUS_ENV: prod
+  DATABASE_URL: postgresql+psycopg://nexus:${POSTGRES_PASSWORD:-nexus-local-only}@db:5432/nexus
+  CORS_ORIGINS: '["http://localhost:3000"]'
+  COOKIE_SECURE: ${COOKIE_SECURE:-false}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  AI_PROVIDER: ${AI_PROVIDER:-none}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  AI_MODEL: ${AI_MODEL:-claude-opus-5-5}
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nexus-local-only}
+      POSTGRES_DB: nexus
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus -d nexus"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: ./backend
+    environment: *backend-env
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build: ./backend
+    environment:
+      <<: *backend-env
+      JOBS_MODE: external
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    # ports: ["8000:8000"]   # uncomment to call the API directly
+    restart: unless-stopped
+
+  worker:
+    build: ./backend
+    environment:
+      <<: *backend-env
+      JOBS_MODE: external
+    command: ["python", "-m", "app.workers.runner"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      disable: true
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        API_ORIGIN: http://api:8000
+    environment:
+      API_ORIGIN: http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

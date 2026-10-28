@@ -31,3 +31,18 @@ Paper-Sessions nutzen denselben `Simulator` wie die Engine und verarbeiten gespe
 
 ## D10 – Charts als eigenes SVG
 Equity, Drawdown und Kerzen werden als eigene SVG-Komponenten gezeichnet. Das vermeidet Lizenzfragen (z. B. Attributionspflicht bei TradingView-Bibliotheken) und zusätzliche Abhängigkeiten.
+
+## D11 – KI nur als Entwurfs- und Erklärwerkzeug
+Der Research-Agent darf ausschließlich unterstützte Indikatoren abfragen, Entwürfe validieren und einen Vorschlag einreichen; der Explain-Agent liest nur gespeicherte Metriken. Strategie anlegen, Backtest und Validierung starten passiert erst nach Bestätigung im UI. Manueller Tool-Loop statt Tool-Runner, damit jede Ausführung serverseitig validiert, begrenzt (Tool-Calls, Zeit, Output-Tokens, Läufe pro Tag) und protokolliert wird. Kein erzwungenes `tool_choice` (vom Modell nicht unterstützt); Nutzertext wird in `<user_task>` eingefasst. Standardmodell `claude-opus-5-5` mit `effort=medium`, serverseitiger Fallback aktivierbar. Ohne Key zeigt das UI einen klaren Hinweis.
+
+## D12 – Frontend als Client-Seiten hinter einem Same-Origin-Proxy
+Alle App-Seiten sind Client-Komponenten mit einem kleinen `useApi`-Hook (Polling für laufende Jobs, Stale-while-revalidate). Next.js leitet `/api/v1` an die API weiter, damit das HttpOnly-Cookie First-Party bleibt und kein CORS nötig ist. Keine Google-Fonts (Builds funktionieren offline), Systemschriften mit tabellarischen Ziffern für Zahlen.
+
+## D13 – Ein Schema-Pfad: Alembic
+In `NEXUS_ENV=dev` mit SQLite führt die API beim Start `alembic upgrade head` aus (statt `create_all`), damit lokale Datenbanken später ohne Konflikt migriert werden können. In `prod` laufen Migrationen als eigener Schritt (Compose-Dienst `migrate`). Nur Tests (`NEXUS_ENV=test`) legen das Schema direkt aus den Modellen an.
+
+## D14 – Datenquellen passend zur Strategie anbieten
+Die API verlangt, dass Symbol und Timeframe von Strategie und Datenquelle übereinstimmen. Das UI bietet deshalb nur passende Quellen an und erklärt, wenn keine existiert, statt einen Fehler erst nach dem Absenden zu zeigen.
+
+## D15 – Discovery filtert zuerst auf Train
+Kandidaten müssen im Train-Segment Mindesttrades, positive Expectancy und Drawdown-Grenze erfüllen, bevor sie das Validierungssegment sehen. Das spart Rechenzeit und hält das Validierungssegment für wenige Kandidaten sauber. Das UI zeigt Train-Kennzahlen und Ablehnungsgründe direkt in der Tabelle.

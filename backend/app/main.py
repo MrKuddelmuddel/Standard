@@ -16,7 +16,7 @@ from app.api.v1 import activity, auth, market_data, runs, strategies
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import log_event, request_id_var, setup_logging
-from app.db.session import get_engine, session_scope
+from app.db.session import session_scope
 from app.services import runs as _runs  # noqa: F401  (registers job handlers)
 from app.services.ai import agent as _agent  # noqa: F401  (registers job handlers)
 from quant import ENGINE_VERSION, EXECUTION_MODEL_VERSION
@@ -25,14 +25,32 @@ log = logging.getLogger("nexus.api")
 API_VERSION = "0.1.0"
 
 
+def _migrate() -> None:
+    from pathlib import Path
+
+    from alembic import command
+    from alembic.config import Config
+
+    from app.db.session import get_engine
+
+    get_engine()  # creates the SQLite directory if needed
+    root = Path(__file__).resolve().parents[1]
+    cfg = Config(str(root / "alembic.ini"))
+    cfg.set_main_option("script_location", str(root / "migrations"))
+    command.upgrade(cfg, "head")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     setup_logging(settings.log_level)
-    if settings.is_sqlite and settings.nexus_env != "prod":
+    if settings.is_sqlite and settings.nexus_env == "dev":
+        _migrate()  # dev convenience; in production run `alembic upgrade head` as a deploy step
+    elif settings.is_sqlite and settings.nexus_env == "test":
         from app.db.base import Base
+        from app.db.session import get_engine
 
-        Base.metadata.create_all(get_engine())  # dev convenience; production uses Alembic migrations
+        Base.metadata.create_all(get_engine())
     worker = None
     if settings.jobs_mode == "thread":
         from app.services.jobs import WorkerThread

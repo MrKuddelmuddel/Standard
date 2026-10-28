@@ -256,7 +256,7 @@ export function StrategyEditor({
               {def.indicators.map((ind, i) => (
                 <div key={i} className="grid grid-cols-[1fr_1fr_80px_auto] items-end gap-1.5">
                   <Field label={i === 0 ? "ID" : ""}>
-                    {(id) => <Input id={id} aria-label={`Indicator ${i + 1} id`} value={ind.id} maxLength={32} onChange={(e) => setIndicator(i, { id: e.target.value.replace(/[^a-zA-Z0-9_]/g, "") })} />}
+                    {(id) => <Input id={id} aria-label={`Indicator ${i + 1} id`} value={ind.id} maxLength={32} onChange={(e) => setIndicator(i, { id: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "") })} />}
                   </Field>
                   <Field label={i === 0 ? "Type" : ""}>
                     {(id) => (
@@ -264,7 +264,7 @@ export function StrategyEditor({
                     )}
                   </Field>
                   <Field label={i === 0 ? "Period" : ""}>
-                    {(id) => <Input id={id} aria-label={`Indicator ${i + 1} period`} type="number" min={1} max={500} value={ind.period} onChange={(e) => setIndicator(i, { period: Math.round(numOr(e.target.value, ind.period)) })} />}
+                    {(id) => <Input id={id} aria-label={`Indicator ${i + 1} period`} type="number" min={2} max={500} value={ind.period} onChange={(e) => setIndicator(i, { period: Math.round(numOr(e.target.value, ind.period)) })} />}
                   </Field>
                   <Button size="sm" variant="ghost" className="mb-0.5" aria-label={`Remove indicator ${ind.id}`} onClick={() => update({ indicators: def.indicators.filter((_, k) => k !== i) })}>
                     Remove

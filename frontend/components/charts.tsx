@@ -40,7 +40,7 @@ export function SeriesChart({
   const W = 800;
   const H = height;
   const padL = 4;
-  const padR = 64;
+  const padR = 84;
   const padT = 8;
   const padB = 20;
   const geo = useMemo(() => {

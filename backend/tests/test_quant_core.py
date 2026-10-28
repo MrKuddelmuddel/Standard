@@ -244,3 +244,15 @@ def test_metrics_report_bootstrap_interval_around_mean():
     assert m["expectancy_ci_low"] is not None and m["expectancy_ci_high"] is not None
     assert m["expectancy_ci_low"] <= m["expectancy"] <= m["expectancy_ci_high"]
     assert "bootstrap" in notes["expectancy_ci_low"]
+
+
+def test_discovery_skips_ema_pairs_where_fast_is_not_shorter():
+    from quant.discovery import ParamGrid, SearchConfig, generate_candidates
+
+    cfg = SearchConfig(
+        templates=["ema_cross"], params=ParamGrid(ema_fast=[20, 60], ema_slow=[50], stop_atr=[2.0], take_profit_r=[2.0])
+    )
+    cands = generate_candidates(cfg)
+    assert len(cands) == 1
+    periods = sorted(i["period"] for i in cands[0][1]["indicators"] if i["type"] == "ema")
+    assert periods == [20, 50]
