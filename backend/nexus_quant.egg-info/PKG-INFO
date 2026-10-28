@@ -13,6 +13,7 @@ Requires-Dist: psycopg[binary]>=3.2
 Requires-Dist: httpx>=0.27
 Requires-Dist: numpy>=1.26
 Requires-Dist: python-multipart>=0.0.9
+Requires-Dist: email-validator>=2.1
 Provides-Extra: ai
 Requires-Dist: anthropic>=0.40; extra == "ai"
 Provides-Extra: dev
