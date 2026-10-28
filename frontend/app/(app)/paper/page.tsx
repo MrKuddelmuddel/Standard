@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
-import { NoDataNotice, sourceLabel, useSources } from "@/components/runs";
+import { compatibleSources, NoCompatibleData, NoDataNotice, sourceLabel, useSources } from "@/components/runs";
 import { Button, Checkbox, EmptyState, ErrorState, Field, Input, IssueList, LinkButton, LoadingBlock, Notice, PageHeader, Panel, Select, StatusBadge, SyntheticBadge, Table, Value } from "@/components/ui";
 import { post } from "@/lib/api";
 import { ago, int, money, pct } from "@/lib/format";
@@ -94,7 +94,9 @@ function CreateSession() {
   const versionOptions = withVersion.map((s) => ({ value: s.current_version!.id, label: `${s.name} · v${s.current_version!.version_number}` }));
   if (versionId && !versionOptions.some((o) => o.value === versionId)) versionOptions.unshift({ value: versionId, label: "Version from backtest" });
   const selVersion = versionId || versionOptions[0].value;
-  const selSource = sourceId || sources.find((s) => s.row_count > 0)?.id || sources[0].id;
+  const selDef = withVersion.find((s) => s.current_version!.id === selVersion)?.current_version?.definition_json;
+  const usable = selDef ? compatibleSources(sources, selDef.symbols[0], selDef.timeframe) : sources.filter((s) => s.row_count > 0);
+  const selSource = usable.some((s) => s.id === sourceId) ? sourceId : (usable[0]?.id ?? "");
 
   async function create() {
     setBusy(true);
@@ -120,7 +122,11 @@ function CreateSession() {
     <div className="space-y-3">
       <Field label="Name">{(id) => <Input id={id} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />}</Field>
       <Field label="Strategy version">{(id) => <Select id={id} value={selVersion} onChange={(e) => setVersionId(e.target.value)} options={versionOptions} />}</Field>
-      <Field label="Data source">{(id) => <Select id={id} value={selSource} onChange={(e) => setSourceId(e.target.value)} options={sources.map((s) => ({ value: s.id, label: sourceLabel(s) }))} />}</Field>
+      {usable.length === 0 ? (
+        <NoCompatibleData symbol={selDef?.symbols[0]} timeframe={selDef?.timeframe} />
+      ) : (
+        <Field label="Data source">{(id) => <Select id={id} value={selSource} onChange={(e) => setSourceId(e.target.value)} options={usable.map((s) => ({ value: s.id, label: sourceLabel(s) }))} />}</Field>
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Initial capital (USDT)">{(id) => <Input id={id} type="number" min={1} value={capital} onChange={(e) => setCapital(e.target.value)} />}</Field>
         <Field label="Replay from (UTC, optional)" hint="Default: the first candle after the indicator warm-up.">
@@ -129,7 +135,7 @@ function CreateSession() {
       </div>
       <Checkbox label="Advance automatically in the background while running" checked={auto} onChange={setAuto} />
       <IssueList error={error} />
-      <Button variant="primary" onClick={() => void create()} loading={busy}>
+      <Button variant="primary" onClick={() => void create()} loading={busy} disabled={!selSource}>
         Create session
       </Button>
     </div>

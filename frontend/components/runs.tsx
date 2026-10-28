@@ -18,10 +18,17 @@ export function useSources() {
   return useApi<Source[]>("/market-data/sources");
 }
 
-/** Pick a data source matching symbol and timeframe when possible. */
-function preferred(sources: Source[], symbol?: string, timeframe?: string): string {
-  const exact = sources.find((s) => s.symbol === symbol && s.timeframe === timeframe && s.row_count > 0);
-  return (exact ?? sources.find((s) => s.row_count > 0) ?? sources[0])?.id ?? "";
+/** Backtests need a source whose symbol and timeframe match the strategy (enforced by the API too). */
+export function compatibleSources(sources: Source[], symbol?: string, timeframe?: string): Source[] {
+  return sources.filter((s) => s.row_count > 0 && (!symbol || s.symbol === symbol) && (!timeframe || s.timeframe === timeframe));
+}
+
+export function NoCompatibleData({ symbol, timeframe }: { symbol?: string; timeframe?: string }) {
+  return (
+    <EmptyState title={`No ${symbol ?? ""} ${timeframe ?? ""} data yet`} action={<LinkButton href="/settings#market-data" variant="primary">Add market data</LinkButton>}>
+      The strategy trades {symbol} on {timeframe} candles. Add a matching data source in Settings (CSV, Binance fetch or synthetic demo data), or change the strategy&apos;s symbol and timeframe.
+    </EmptyState>
+  );
 }
 
 function toMs(v: string): number | null {
@@ -53,8 +60,9 @@ export function RunBacktestForm({ strategyId, versionId, symbol, timeframe, fee,
 
   if (loading && !sources) return <LoadingBlock rows={2} />;
   if (!sources || sources.length === 0) return <NoDataNotice />;
-  const selected = sourceId || preferred(sources, symbol, timeframe);
-  const src = sources.find((s) => s.id === selected);
+  const usable = compatibleSources(sources, symbol, timeframe);
+  if (usable.length === 0) return <NoCompatibleData symbol={symbol} timeframe={timeframe} />;
+  const selected = usable.some((s) => s.id === sourceId) ? sourceId : usable[0].id;
 
   async function run() {
     setBusy(true);
@@ -79,8 +87,8 @@ export function RunBacktestForm({ strategyId, versionId, symbol, timeframe, fee,
   return (
     <div className="space-y-3">
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        <Field label="Data source" className="md:col-span-2 xl:col-span-3" hint={src && (src.symbol !== symbol || src.timeframe !== timeframe) ? `The strategy is defined for ${symbol} ${timeframe}; the backtest uses this source.` : undefined}>
-          {(id) => <Select id={id} value={selected} onChange={(e) => setSourceId(e.target.value)} options={sources.map((s) => ({ value: s.id, label: sourceLabel(s) }))} />}
+        <Field label="Data source" className="md:col-span-2 xl:col-span-3" hint={`Showing sources for ${symbol} ${timeframe}.`}>
+          {(id) => <Select id={id} value={selected} onChange={(e) => setSourceId(e.target.value)} options={usable.map((s) => ({ value: s.id, label: sourceLabel(s) }))} />}
         </Field>
         <Field label="Initial capital (USDT)">{(id) => <Input id={id} type="number" min={1} value={capital} onChange={(e) => setCapital(e.target.value)} />}</Field>
         <Field label="Start (UTC, optional)">{(id) => <Input id={id} type="date" value={start} onChange={(e) => setStart(e.target.value)} />}</Field>
@@ -110,7 +118,9 @@ export function RunValidationForm({ versionId, symbol, timeframe, onCreated }: {
 
   if (loading && !sources) return <LoadingBlock rows={2} />;
   if (!sources || sources.length === 0) return <NoDataNotice />;
-  const selected = sourceId || preferred(sources, symbol, timeframe);
+  const usable = compatibleSources(sources, symbol, timeframe);
+  if (usable.length === 0) return <NoCompatibleData symbol={symbol} timeframe={timeframe} />;
+  const selected = usable.some((s) => s.id === sourceId) ? sourceId : usable[0].id;
 
   async function run() {
     setBusy(true);
@@ -137,7 +147,7 @@ export function RunValidationForm({ versionId, symbol, timeframe, onCreated }: {
     <div className="space-y-3">
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         <Field label="Data source" className="md:col-span-2 xl:col-span-5">
-          {(id) => <Select id={id} value={selected} onChange={(e) => setSourceId(e.target.value)} options={sources.map((s) => ({ value: s.id, label: sourceLabel(s) }))} />}
+          {(id) => <Select id={id} value={selected} onChange={(e) => setSourceId(e.target.value)} options={usable.map((s) => ({ value: s.id, label: sourceLabel(s) }))} />}
         </Field>
         <Field label="Train fraction">{(id) => <Input id={id} type="number" step="0.05" min={0.25} max={0.85} value={train} onChange={(e) => setTrain(e.target.value)} />}</Field>
         <Field label="Validation fraction">{(id) => <Input id={id} type="number" step="0.05" min={0} max={0.45} value={val} onChange={(e) => setVal(e.target.value)} />}</Field>

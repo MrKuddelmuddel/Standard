@@ -23,16 +23,21 @@ export function AuthProvider({ children, requireAuth }: { children: ReactNode; r
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(async () => {
-    try {
-      setUser(await api<User>("/auth/me"));
-    } catch (e) {
-      setUser(null);
-      if (requireAuth && e instanceof ApiError && e.status === 401) router.replace("/login");
-    } finally {
-      setLoading(false);
-    }
-  }, [requireAuth, router]);
+  const refresh = useCallback(
+    () =>
+      api<User>("/auth/me").then(
+        (u) => {
+          setUser(u);
+          setLoading(false);
+        },
+        (e: unknown) => {
+          setUser(null);
+          setLoading(false);
+          if (requireAuth && e instanceof ApiError && e.status === 401) router.replace("/login");
+        },
+      ),
+    [requireAuth, router],
+  );
 
   const logout = useCallback(async () => {
     try {

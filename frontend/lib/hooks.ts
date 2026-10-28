@@ -12,11 +12,14 @@ export type Resource<T> = {
   setData: (d: T) => void;
 };
 
-/** Fetch a GET endpoint. Pass `null` to skip. `pollMs` re-fetches while `shouldPoll(data)` is true. */
+type State<T> = { path: string | null; data: T | undefined; error: unknown };
+
+/**
+ * Fetch a GET endpoint. Pass `null` to skip. `pollMs` re-fetches while `shouldPoll(data)` is true.
+ * Keeps the previous data while a new path loads; `loading` is true until the current path has answered once.
+ */
 export function useApi<T>(path: string | null, opts: { pollMs?: number; shouldPoll?: (d: T | undefined) => boolean } = {}): Resource<T> {
-  const [data, setData] = useState<T | undefined>(undefined);
-  const [error, setError] = useState<unknown>(null);
-  const [loading, setLoading] = useState<boolean>(path !== null);
+  const [state, setState] = useState<State<T>>({ path: null, data: undefined, error: null });
   const seq = useRef(0);
   const { pollMs, shouldPoll } = opts;
   const shouldPollRef = useRef(shouldPoll);
@@ -24,36 +27,34 @@ export function useApi<T>(path: string | null, opts: { pollMs?: number; shouldPo
     shouldPollRef.current = shouldPoll;
   }, [shouldPoll]);
 
-  const load = useCallback(async () => {
-    if (path === null) return;
+  const fetchPath = useCallback((p: string): Promise<void> => {
     const id = ++seq.current;
-    try {
-      const d = await api<T>(path);
-      if (id === seq.current) {
-        setData(d);
-        setError(null);
-      }
-    } catch (e) {
-      if (id === seq.current) setError(e);
-    } finally {
-      if (id === seq.current) setLoading(false);
-    }
-  }, [path]);
+    return api<T>(p).then(
+      (d) => {
+        if (id === seq.current) setState({ path: p, data: d, error: null });
+      },
+      (e: unknown) => {
+        if (id === seq.current) setState((s) => ({ path: p, data: s.data, error: e }));
+      },
+    );
+  }, []);
 
   useEffect(() => {
-    setLoading(path !== null);
-    void load();
-  }, [load, path]);
+    if (path !== null) void fetchPath(path);
+  }, [path, fetchPath]);
 
+  const data = state.data;
   useEffect(() => {
     if (!pollMs || path === null) return;
     const t = setInterval(() => {
-      if (!shouldPollRef.current || shouldPollRef.current(data)) void load();
+      if (!shouldPollRef.current || shouldPollRef.current(data)) void fetchPath(path);
     }, pollMs);
     return () => clearInterval(t);
-  }, [pollMs, path, load, data]);
+  }, [pollMs, path, fetchPath, data]);
 
-  return { data, error, loading, reload: load, setData };
+  const reload = useCallback(() => (path === null ? Promise.resolve() : fetchPath(path)), [path, fetchPath]);
+  const setData = useCallback((d: T) => setState((s) => ({ ...s, data: d, error: null })), []);
+  return { data, error: state.path === path ? state.error : null, loading: path !== null && state.path !== path, reload, setData };
 }
 
 export const isActive = (status: string | undefined) => status === "queued" || status === "running";
