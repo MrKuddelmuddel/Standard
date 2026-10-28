@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* NEXUS QUANT design tokens. Dark, neutral, dense. Mint only for positive values, red only for negatives and errors. */
+@theme {
+  --color-bg: #0b0d10;
+  --color-panel: #111418;
+  --color-panel-2: #161a1f;
+  --color-raised: #1c2128;
+  --color-line: #252b33;
+  --color-line-strong: #333b45;
+  --color-fg: #e6e9ed;
+  --color-fg-muted: #9aa4af;
+  --color-fg-faint: #6b7580;
+  --color-accent: #4fd1a5;
+  --color-accent-strong: #2fb98b;
+  --color-accent-soft: #12352b;
+  --color-negative: #f07178;
+  --color-negative-soft: #3a1a1d;
+  --color-warning: #e5b567;
+  --color-warning-soft: #3a2e17;
+  --color-info: #7cb7ff;
+  --color-info-soft: #172a40;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.02) inset, 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

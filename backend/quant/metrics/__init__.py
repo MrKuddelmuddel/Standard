@@ -86,6 +86,11 @@ def compute_metrics(
         m["avg_holding_bars"] = bars
         m["avg_holding_hours"] = bars * bar_ms / 3_600_000
         m["largest_loss"] = float(pnl.min()) if pnl.min() < 0 else None
+    if n >= 2:
+        ci = bootstrap_mean_ci([float(x) for x in pnl])
+        if ci is not None:
+            m["expectancy_ci_low"], m["expectancy_ci_high"] = ci
+            notes["expectancy_ci_low"] = "95 % bootstrap interval of the mean trade P&L (2000 resamples, fixed seed)."
     if bars_in_position is not None and len(equity):
         m["exposure"] = bars_in_position / len(equity)
     if 0 < n < MIN_TRADES_FOR_STATISTICS:

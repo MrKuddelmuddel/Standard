@@ -230,3 +230,17 @@ def test_binance_rejects_unsupported_symbol():
     p = BinanceSpotProvider(client=httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, json=[]))))
     with pytest.raises(ProviderError, match="not supported"):
         p.fetch_historical_candles("DOGEUSDT", "1h", T0, T0 + H)
+
+
+def test_metrics_report_bootstrap_interval_around_mean():
+    import numpy as np
+
+    from quant.metrics import compute_metrics
+
+    trades = [
+        {"net_pnl": v, "fees": 1.0, "slippage_cost": 0.5, "bars_held": 3} for v in (10.0, -5.0, 20.0, -8.0, 3.0, 7.0)
+    ]
+    m, notes = compute_metrics(trades, np.array([10_000.0, 10_027.0]), 10_000.0, 3_600_000)
+    assert m["expectancy_ci_low"] is not None and m["expectancy_ci_high"] is not None
+    assert m["expectancy_ci_low"] <= m["expectancy"] <= m["expectancy_ci_high"]
+    assert "bootstrap" in notes["expectancy_ci_low"]
